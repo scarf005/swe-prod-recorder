@@ -37,6 +37,8 @@ conda activate recorder
 pip install -e .
 ```
 
+If you are on a Mac, you will need to enable additional permissions. See the instructions [here](https://docs.google.com/document/d/1kcVAi28N4hAu_FuuRBffViv0rwcA2tny7jCBvH-0zyI/edit?tab=t.r88ylnapzh5a#heading=h.lmf23ws57a4n)
+
 ### Optional Features
 
 **Google Drive uploads:**
