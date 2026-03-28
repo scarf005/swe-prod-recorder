@@ -1,7 +1,6 @@
 import argparse
 import asyncio
 import os
-import platform
 import signal
 import sys
 import threading
@@ -43,7 +42,14 @@ def parse_args():
         "--all",
         dest="record_all_screens",
         action="store_true",
-        help="Record all monitors/screens (no window selection needed). Default on Linux.",
+        default=True,
+        help="Record all monitors/screens (no window selection needed). Enabled by default.",
+    )
+    parser.add_argument(
+        "--window",
+        dest="record_all_screens",
+        action="store_false",
+        help="Use interactive window selection instead of recording all screens.",
     )
     parser.add_argument(
         "--inactivity-timeout",
@@ -98,9 +104,17 @@ def main():
     """
     args = parse_args()
 
-    # Default to --all on Linux
-    if platform.system() == "Linux" and not args.record_all_screens:
-        args.record_all_screens = True
+    # Window selection is not supported with multiple monitors — force --all
+    if not args.record_all_screens:
+        import mss
+        with mss.mss() as sct:
+            num_monitors = len(sct.monitors) - 1  # monitors[0] is the virtual combined monitor
+        if num_monitors > 1:
+            print(f"\n⚠️  Multiple monitors detected ({num_monitors}). "
+                  "Window selection is not supported with multiple monitors.")
+            print("Falling back to --all (recording all screens).")
+            input("\nPress Enter to continue...")
+            args.record_all_screens = True
 
     if args.upload_to_gdrive:
         try:
